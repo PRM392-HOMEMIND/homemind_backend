@@ -1,0 +1,69 @@
+{
+  "name": "homemind_backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage.enabled --coverage.provider=v8 --coverage.reporter=json-summary --coverage.include=src/assistant/assistant.service.ts --coverage.include=src/billing/** --coverage.include=src/me/** --coverage.include=src/common/dto.ts",
+    "prisma:generate": "prisma generate",
+    "db:demo:seed": "node scripts/seed-demo-data.cjs",
+    "db:deploy": "prisma migrate deploy",
+    "db:migrate": "prisma migrate deploy",
+    "db:status": "prisma migrate status"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/platform-express": "^10.4.0",
+    "@nestjs/swagger": "^7.4.0",
+    "@nestjs/throttler": "^6.7.1",
+    "@payos/node": "2.0.5",
+    "@prisma/client": "^6.19.0",
+    "@types/nodemailer": "^8.0.2",
+    "argon2": "^0.45.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "dotenv": "^16.4.5",
+    "jose": "^5.9.6",
+    "libphonenumber-js": "^1.13.14",
+    "nodemailer": "^10.3.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "overrides": {
+    "brace-expansion": "2.1.7",
+    "test-exclude": {
+      "minimatch": {
+        "brace-expansion": "5.0.8"
+      }
+    },
+    "deepmerge-ts": "8.0.2",
+    "ip-address": "10.7.3",
+    "js-yaml@^3.0.0": "3.15.2",
+    "js-yaml@^4.0.0": "4.3.2",
+    "lodash": "4.18.1",
+    "multer": "2.4.0",
+    "pacote": "21.5.1",
+    "picomatch@^2.0.0": "2.3.2",
+    "picomatch@^3.0.0": "3.0.2",
+    "picomatch@^4.0.0": "4.0.7",
+    "sigstore": "4.1.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "@vitest/coverage-v8": "2.1.9",
+    "eslint": "^10.14.0",
+    "prisma": "^6.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
