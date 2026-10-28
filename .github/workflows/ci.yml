@@ -1,0 +1,147 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  pull_request:
+    branches: [main, develop]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+concurrency:
+  group: ci-backend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  DIRECT_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  MIGRATION_DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  AUTH_ACCESS_SECRET: homemind_access_secret_super_secure_random_key_32bytes_1
+  AUTH_REFRESH_SECRET: homemind_refresh_secret_super_secure_random_key_32bytes_2
+  AUTH_RESET_SECRET: homemind_reset_secret_super_secure_random_key_32bytes_3
+
+jobs:
+  static-checks:
+    name: Lint & Typecheck
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+  unit-tests:
+    name: Automated Unit Tests
+    needs: [static-checks]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run unit test suite
+        env:
+          DATABASE_URL: postgresql://homemind_app:testfixture123@127.0.0.1:5432/homemind
+          AUTH_ACCESS_SECRET: homemind_access_secret_super_secure_random_key_32bytes_1
+          AUTH_REFRESH_SECRET: homemind_refresh_secret_super_secure_random_key_32bytes_2
+          AUTH_RESET_SECRET: homemind_reset_secret_super_secure_random_key_32bytes_3
+        run: npm test
+
+  db-integration:
+    name: Database Integration Tests
+    needs: [unit-tests]
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword123
+          POSTGRES_DB: homemind
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Seed Database Roles & Deploy Migration
+        env:
+          DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+          MIGRATION_DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+        run: |
+          psql "postgresql://postgres:testpassword123@127.0.0.1:5432/homemind" -c "CREATE ROLE homemind_migrator WITH LOGIN PASSWORD 'testpassword123'; CREATE ROLE homemind_app WITH LOGIN PASSWORD 'testpassword123'; GRANT ALL PRIVILEGES ON DATABASE homemind TO homemind_migrator; GRANT USAGE ON SCHEMA public TO homemind_app; GRANT homemind_migrator TO postgres; GRANT homemind_app TO postgres;"
+          npx prisma migrate deploy
+
+      - name: Run Integration test suite
+        env:
+          DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+          AUTH_ACCESS_SECRET: homemind_access_secret_super_secure_random_key_32bytes_1
+          AUTH_REFRESH_SECRET: homemind_refresh_secret_super_secure_random_key_32bytes_2
+          AUTH_RESET_SECRET: homemind_reset_secret_super_secure_random_key_32bytes_3
+        run: npm run test:coverage
+
+  image-build:
+    name: Docker Container Packaging
+    needs: [db-integration]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image verification
+        run: docker build --platform linux/amd64 -t homemind-backend:ci .
