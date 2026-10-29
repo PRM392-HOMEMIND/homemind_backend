@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String?   @unique
+  phone           String?   @unique
+  passwordHash    String    @map("password_hash")
+  status          String    @default("ACTIVE")
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  phoneVerifiedAt DateTime? @map("phone_verified_at") @db.Timestamptz(6)
+  passwordChangedAt DateTime @default(now()) @map("password_changed_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+  termsAcceptedAt DateTime? @map("terms_accepted_at") @db.Timestamptz(6)
+  privacyAcceptedAt DateTime? @map("privacy_accepted_at") @db.Timestamptz(6)
+  @@map("users")
+}
+
+model RefreshSession {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  familyId        String    @map("family_id") @db.Uuid
+  tokenHash       String    @unique @map("token_hash")
+  expiresAt       DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+  replacedBySessionId String? @unique @map("replaced_by_session_id") @db.Uuid
+  userAgent       String?   @map("user_agent")
+  ip              String?
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, familyId])
+  @@map("refresh_sessions")
+}
+
+model PasswordResetToken {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  tokenHash       String    @unique @map("token_hash")
+  expiresAt       DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt          DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model Profile {
+  id          String   @id @db.Uuid
+  displayName String   @map("display_name")
+  phone       String?
+  address     String?
+  language    String   @default("vi")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("profiles")
+}
+
+model Workspace {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  type      String   @default("household")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  archivedAt DateTime? @map("archived_at") @db.Timestamptz(6)
+
+  @@map("workspaces")
+}
+
+model UpgradeRequest {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  plan        String
+  source      String   @default("unknown")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@unique([workspaceId, userId, plan])
+  @@index([createdAt])
+  @@map("upgrade_requests")
+}
+
+model WorkspaceMember {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId String   @map("workspace_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  role        String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model NotificationPreference {
+  userId          String   @id @map("user_id") @db.Uuid
+  freshDaysBefore Int      @default(5) @map("fresh_days_before")
+  dryDaysBefore   Int      @default(30) @map("dry_days_before")
+  pushEnabled     Boolean  @default(true) @map("push_enabled")
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("notification_preferences")
+}
+
+model NotificationRead {
+  workspaceId     String   @map("workspace_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  notificationKey String   @map("notification_key")
+  readAt          DateTime @default(now()) @map("read_at") @db.Timestamptz(6)
+
+  @@id([workspaceId, userId, notificationKey])
+  @@index([userId, readAt])
+  @@map("notification_reads")
+}
+
+model WorkspaceEntitlement {
+  workspaceId  String   @id @map("workspace_id") @db.Uuid
+  plan         String   @default("free")
+  productLimit Int?     @default(30) @map("product_limit")
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  source       String   @default("free")
+  feedbackManualReleasedAt DateTime? @map("feedback_manual_released_at") @db.Timestamptz(6)
+
+  @@map("workspace_entitlements")
+}
+
+model BillingPrice {
+  id           String @id
+  plan         String
+  amount       Int
+  currency     String
+  months       Int
+  productLimit Int? @map("product_limit")
+  active       Boolean @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@map("billing_prices")
+}
+
+model BillingOrder {
+  id             String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId    String @map("workspace_id") @db.Uuid
+  actorId        String @map("actor_id") @db.Uuid
+  idempotencyKey String @map("idempotency_key") @db.Uuid
+  payloadHash    String @map("payload_hash")
+  orderCode      BigInt @unique @map("order_code")
+  channel        String
+  priceId        String @map("price_id")
+  priceSnapshot  Json @map("price_snapshot")
+  description    String
+  paymentLinkId  String? @unique @map("payment_link_id")
+  checkoutUrl    String? @map("checkout_url")
+  status         String @default("CREATED")
+  financialState String @default("UNPAID") @map("financial_state")
+  fulfillment    String @default("NONE")
+  reviewReason   String? @map("review_reason")
+  amountPaid     Int @default(0) @map("amount_paid")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt      DateTime @default(dbgenerated("now() + interval '30 minutes'")) @map("expires_at") @db.Timestamptz(6)
+  paidAt         DateTime? @map("paid_at") @db.Timestamptz(6)
+  cancelledAt    DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  cancellationTimeSource String? @map("cancellation_time_source")
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  leaseId        String? @map("lease_id") @db.Uuid
+  leaseUntil     DateTime? @map("lease_until") @db.Timestamptz(6)
+  nextCheckAt    DateTime @default(now()) @map("next_check_at") @db.Timestamptz(6)
+  attempts       Int @default(0)
+  @@unique([workspaceId,actorId,idempotencyKey])
+  @@map("billing_orders")
+}
+
+model BillingGrant {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Null for PROMOTION time (feedback popup reward); always set for PAID time.
+  orderId      String? @unique @map("order_id") @db.Uuid
+  workspaceId  String @map("workspace_id") @db.Uuid
+  plan         String
+  productLimit Int? @map("product_limit")
+  startsAt     DateTime @map("starts_at") @db.Timestamptz(6)
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz(6)
+  priceSnapshot Json @map("price_snapshot")
+  sourceKind   String @default("PAID") @map("source_kind")
+  rewardId     String? @map("reward_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([workspaceId,startsAt,expiresAt],map:"billing_grants_effective_idx")
+  @@map("billing_grants")
+}
+
+model BillingTransaction {
+  channel   String
+  reference String
+  orderId   String @map("order_id") @db.Uuid
+  amount    Int
+  paidAt    DateTime @map("paid_at") @db.Timestamptz(6)
+  @@id([channel,reference])
+  @@map("billing_transactions")
+}
+
+model BillingWebhookInbox {
+  channel       String
+  fingerprint   String
+  orderCode     BigInt @map("order_code")
+  reference     String
+  paymentLinkId String @map("payment_link_id")
+  amount        Int
+  currency      String
+  description   String
+  receivedAt    DateTime @default(now()) @map("received_at") @db.Timestamptz(6)
+  @@id([channel,fingerprint])
+  @@index([channel,orderCode],map:"billing_inbox_order_idx")
+  @@map("billing_webhook_inbox")
+}
+
+model BillingIdentity {
+  singleton Boolean @id @default(true)
+  namespace Int
+  channel   String
+  @@map("billing_identity")
+}
+
+model Product {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId    String    @map("workspace_id") @db.Uuid
+  name           String
+  nameNormalized String    @map("name_normalized")
+  category       String?
+  defaultUnit    String?   @map("default_unit")
+  status         String    @default("in_stock")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  archivedAt     DateTime? @map("archived_at") @db.Timestamptz(6)
+  createdBy      String?   @map("created_by") @db.Uuid
+
+  @@unique([workspaceId, id])
+  @@index([workspaceId, nameNormalized])
+  @@map("products")
+}
+
+model InventoryLot {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  productId   String    @map("product_id") @db.Uuid
+  purchaseId  String    @default(dbgenerated("gen_random_uuid()")) @map("purchase_id") @db.Uuid
+  quantity    Decimal   @db.Decimal(12, 3)
+  unit        String?
+  quantityKnown Boolean @default(true) @map("quantity_known")
+  expiryDate  DateTime? @map("expiry_date") @db.Date
+  priceVnd    BigInt?   @map("price_vnd")
+  storageLocation String? @map("storage_location")
+  createdBy   String?    @map("created_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([workspaceId, id])
+  @@index([workspaceId, expiryDate])
+  @@index([workspaceId, createdAt(sort: Desc)], map: "inventory_lots_workspace_created_idx")
+  @@index([workspaceId, purchaseId], map: "inventory_purchase_origin")
+  @@map("inventory_lots")
+}
+
+model InventoryTransaction {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId     String   @map("workspace_id") @db.Uuid
+  productId       String   @map("product_id") @db.Uuid
+  lotId           String?  @map("lot_id") @db.Uuid
+  action          String
+  quantityDelta   Decimal  @map("quantity_delta") @db.Decimal(12, 3)
+  source          String
+  assistantTurnId String?  @map("assistant_turn_id") @db.Uuid
+  createdBy       String   @map("created_by") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("inventory_transactions")
+}
+
+model ShoppingItem {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId     String    @map("workspace_id") @db.Uuid
+  name            String
+  quantity        Decimal?  @db.Decimal(12, 3)
+  unit            String?
+  status          String    @default("needed")
+  source          String    @default("manual")
+  linkedProductId String?   @map("linked_product_id") @db.Uuid
+  assistantTurnId String?   @map("assistant_turn_id") @db.Uuid
+  createdBy       String?   @map("created_by") @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([workspaceId, id])
+  @@map("shopping_items")
+}
+
+model AssistantTurn {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspaceId      String    @map("workspace_id") @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  rawInput         String    @map("raw_input")
+  correctedInput   String?   @map("corrected_input")
+  kind             String
+  toolsJson        Json      @default("[]") @map("tools_json")
+  dataJson         Json?     @map("data_json")
+  draftJson        Json?     @map("draft_json")
+  message          String?
+  status           String
+  processingTimeMs Int?      @map("processing_time_ms")
+  dictionaryVersion String   @default("1.1.0") @map("dictionary_version")
+  errorCode        String?   @map("error_code")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime? @map("expires_at") @db.Timestamptz(6)
+  committedAt      DateTime? @map("committed_at") @db.Timestamptz(6)
+
+  @@index([workspaceId, createdAt])
+  @@map("assistant_turns")
+}
+
+model IdempotencyOperation {
+  workspaceId    String    @map("workspace_id") @db.Uuid
+  idempotencyKey String    @map("idempotency_key") @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  operation      String
+  payloadHash    String    @map("payload_hash")
+  resultJson     Json?     @map("result_json")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@id([workspaceId, idempotencyKey])
+  @@map("idempotency_operations")
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=HomeMind daily admin audit retention
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=15m
+Persistent=true
+Unit=homemind-admin-audit.service
+
+[Install]
+WantedBy=timers.target

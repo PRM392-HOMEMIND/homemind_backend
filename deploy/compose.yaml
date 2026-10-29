@@ -1,0 +1,87 @@
+name: homemind
+services:
+  db:
+    image: ${DB_IMAGE:?DB_IMAGE must be an immutable tested digest}
+    restart: unless-stopped
+    command: [postgres, -c, log_min_error_statement=panic, -c, log_error_verbosity=terse]
+    environment:
+      POSTGRES_DB: homemind
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/admin_password
+      PGDATA: /var/lib/postgresql/18/docker
+    secrets: [admin_password, migrator_password, app_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./db/init-roles.sh:/docker-entrypoint-initdb.d/10-homemind-roles.sh:ro
+    networks: [database]
+    shm_size: 256m
+    cpus: 2
+    mem_limit: 2g
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U postgres -d homemind']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    logging: &logging
+      driver: json-file
+      options: {max-size: 10m, max-file: '5'}
+  api:
+    image: ${APP_IMAGE:?APP_IMAGE must be an immutable digest}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    env_file: ['${SECRETS_DIRECTORY:-/etc/homemind}/api.env']
+    environment:
+      RELEASE_SHA: ${RELEASE_SHA:?RELEASE_SHA is required}
+    ports: ['127.0.0.1:3000:3000']
+    networks:
+      database: {}
+      egress: {gw_priority: 1}
+    depends_on:
+      db: {condition: service_healthy}
+    cpus: 2
+    mem_limit: 1g
+    stop_grace_period: 30s
+    healthcheck:
+      test: [CMD, node, -e, "require('http').get('http://127.0.0.1:3000/v1/health/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging: *logging
+  migrate:
+    image: ${MIGRATION_IMAGE:?MIGRATION_IMAGE must be an immutable digest}
+    profiles: [tools]
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp]
+    env_file: ['${SECRETS_DIRECTORY:-/etc/homemind}/migration.env']
+    networks: [database]
+    depends_on:
+      db: {condition: service_healthy}
+    cpus: 2
+    mem_limit: 1g
+    logging: *logging
+volumes:
+  postgres_data:
+    name: homemind_postgres18_data
+networks:
+  database:
+    internal: true
+    ipam:
+      config: [{subnet: 172.28.43.0/24}]
+  egress:
+    ipam:
+      config: [{subnet: 172.28.42.0/24, gateway: 172.28.42.1}]
+secrets:
+  admin_password:
+    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-admin-password
+  migrator_password:
+    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-migrator-password
+  app_password:
+    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-app-password
