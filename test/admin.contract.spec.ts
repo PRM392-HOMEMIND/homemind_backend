@@ -34,3 +34,5 @@ describe('admin output, configuration and SQL contract',()=>{
   const grants=readFileSync('prisma/admin-grants.sql','utf8');expect(grants).not.toMatch(/grant (insert|update|delete).*public\./i);expect(grants).not.toMatch(/grant.*homemind_admin_api to homemind_app/i);
  });
 });
+
+// Handled by Le Nguyen Quoc Hung
