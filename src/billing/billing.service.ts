@@ -114,3 +114,5 @@ export class BillingService implements OnModuleInit, OnModuleDestroy {
     return {code:'00',desc:'Accepted'};
   }
 }
+
+// Handled by Tran Huu Thang
