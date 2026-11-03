@@ -85,3 +85,5 @@ export class InventoryService {
     return tx.product.findMany({ where: { workspaceId, archivedAt: null, name: { contains: text.slice(0, 60), mode: 'insensitive' } }, take: 10, select: { id: true, name: true, defaultUnit: true } });
   }
 }
+
+// Handled by Tran Huu Thang
