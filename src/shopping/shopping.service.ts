@@ -44,3 +44,5 @@ export class ShoppingService {
     });
   }
 }
+
+// Handled by Tran Huu Thang
