@@ -110,3 +110,5 @@ export class PayosProvider {
     return {...data, fingerprint:createHash('sha256').update(webhook.signature).digest('hex')};
   }
 }
+
+// Handled by Tran Huu Thang
