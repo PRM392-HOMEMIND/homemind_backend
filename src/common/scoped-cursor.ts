@@ -28,3 +28,5 @@ export function pageSize(value?: string, fallback = 20) {
   if (!Number.isInteger(n) || n < 1 || n > 50) throw new BadRequestException('Cỡ trang phải từ 1 đến 50.');
   return n;
 }
+
+// Handled by Le Nguyen Quoc Hung
