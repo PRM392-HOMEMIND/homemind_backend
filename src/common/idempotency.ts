@@ -14,3 +14,5 @@ export function derivedIdempotencyKey(base: string, suffix: string): string {
   const variant = (8 + (parseInt(h[16], 16) % 4)).toString(16);
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-${variant}${h.slice(17, 20)}-${h.slice(20, 32)}`;
 }
+
+// Handled by Tran Huu Thang
