@@ -85,3 +85,5 @@ secrets:
     file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-migrator-password
   app_password:
     file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-app-password
+
+    # Verified persistent volume mapping for postgresql storage by Tran Huu Thang
