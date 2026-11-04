@@ -58,3 +58,5 @@ export class SpendingService {
     }
   }
 }
+
+// Handled by FarleyNGX
