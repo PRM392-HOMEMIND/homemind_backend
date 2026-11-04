@@ -81,9 +81,9 @@ export function environment() {
     aiModel: process.env.AI_MODEL?.trim() || 'qwen2.5:7b',
     aiApiKey: process.env.AI_API_KEY?.trim() ?? '',
     payosEnabled, payosKeys, billingNamespace,
-    payosWebhookUrl: 'https://api.homemind.vn/v1/billing/payos/webhook',
-    payosReturnUrl: 'https://api.homemind.vn/v1/billing/payos/return',
-    payosCancelUrl: 'https://api.homemind.vn/v1/billing/payos/cancel',
+    payosWebhookUrl: process.env.PAYOS_WEBHOOK_URL?.trim() || `${(process.env.PUBLIC_API_URL?.trim() || 'https://homemind.ddns.net').replace(/\/+$/, '')}/v1/billing/payos/webhook`,
+    payosReturnUrl: process.env.PAYOS_RETURN_URL?.trim() || `${(process.env.PUBLIC_API_URL?.trim() || 'https://homemind.ddns.net').replace(/\/+$/, '')}/v1/billing/payos/return`,
+    payosCancelUrl: process.env.PAYOS_CANCEL_URL?.trim() || `${(process.env.PUBLIC_API_URL?.trim() || 'https://homemind.ddns.net').replace(/\/+$/, '')}/v1/billing/payos/cancel`,
   };
 }
 export type Environment = ReturnType<typeof environment>;
