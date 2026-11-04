@@ -66,6 +66,11 @@ jobs:
         run: npx prisma generate
 
       - name: Run unit test suite
+        env:
+          DATABASE_URL: postgresql://homemind_app:testfixture123@127.0.0.1:5432/homemind
+          AUTH_ACCESS_SECRET: homemind_access_secret_super_secure_random_key_32bytes_1
+          AUTH_REFRESH_SECRET: homemind_refresh_secret_super_secure_random_key_32bytes_2
+          AUTH_RESET_SECRET: homemind_reset_secret_super_secure_random_key_32bytes_3
         run: npm test
 
   db-integration:
