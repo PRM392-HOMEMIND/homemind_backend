@@ -76,6 +76,10 @@ export function environment() {
     // API thủ công và OpenAPI vẫn chạy khi AI chưa được cấu hình; planner trả 503 khi được gọi.
     geminiKey: process.env.GEMINI_API_KEY?.trim() ?? '',
     geminiModel: process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash-lite',
+    aiProvider: (process.env.AI_PROVIDER?.trim() || 'gemini').toLowerCase(),
+    aiBaseUrl: process.env.AI_BASE_URL?.trim()?.replace(/\/+$/, '') ?? '',
+    aiModel: process.env.AI_MODEL?.trim() || 'qwen2.5:7b',
+    aiApiKey: process.env.AI_API_KEY?.trim() ?? '',
     payosEnabled, payosKeys, billingNamespace,
     payosWebhookUrl: 'https://api.homemind.vn/v1/billing/payos/webhook',
     payosReturnUrl: 'https://api.homemind.vn/v1/billing/payos/return',

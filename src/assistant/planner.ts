@@ -153,20 +153,108 @@ export function validatePlan(value: unknown, isNested = false): Plan {
   return result;
 }
 
+export function buildCompactPrompt(text: string, candidates: Array<{ id: string; name: string; unit?: string | null }>, clientDate: string): string {
+  return `Bạn là bộ định tuyến nghiệp vụ HomeMind. Trả về DUY NHẤT một JSON object: {"toolId": string, "arguments": object}.
+Các tool được phép:
+- inventory.add: Thêm hàng đã mua/đã có vào kho. arguments: { productName, quantity, unit, priceVnd, storageLocation, expiryDate } hoặc { items: [{ productName, quantity, unit, priceVnd, storageLocation, expiryDate }] }
+- inventory.mark_out: Báo dùng hết/bán hết/hết hàng. arguments: { productId, quantity, remainingQuantity }
+- inventory.set_expiry: Cập nhật hạn dùng cho sản phẩm đã có. arguments: { productId, quantity, expiryDate }
+- inventory.list: Xem/tìm hàng trong kho. arguments: { query, category }
+- inventory.expiring: Xem hàng sắp hết hạn/quá hạn. arguments: { range: 'expired' | 'next_7_days' | 'next_30_days' | 'this_week' | 'this_month' }
+- shopping.add: Cần mua/nhớ mua/dự định mua thêm. arguments: { name, quantity, unit } hoặc { items: [{ name, quantity, unit }] }
+- shopping.skip: Bỏ qua/xóa món khỏi danh sách mua sắm. arguments: { names: [string] }
+- shopping.list: Xem danh sách cần mua sắm. arguments: {}
+- spending.month: Xem chi tiêu/tiền đã tiêu. arguments: { month: 'YYYY-MM' }
+- home.summary: Xem tóm tắt tổng quan nhà cửa. arguments: {}
+- clarify: Lời nói không rõ hoặc cần làm rõ. arguments: { question }
+Quy tắc:
+1. shopping.add dùng thuộc tính 'name' (hoặc items có 'name'). inventory.add dùng 'productName' (hoặc items có 'productName').
+2. inventory.mark_out chỉ dùng productId có trong Candidates; nếu không khớp candidate nào thì clarify.
+3. Chỉ trả về JSON thuần túy, không có giải thích hay markdown.
+Ngày hiện tại: ${clientDate}. Candidates: ${JSON.stringify(candidates)}`;
+}
+
 @Injectable()
 export class AiPlanner {
   private readonly config = environment();
 
   async plan(text: string, candidates: Array<{ id: string; name: string; unit?: string | null }>, clientDate: string,signal?:AbortSignal): Promise<Plan> {
+    const isLocalAi = Boolean(this.config.aiBaseUrl && (this.config.aiProvider === 'openai_compatible' || this.config.aiProvider === 'ollama' || this.config.aiProvider === 'local'));
+    const activeModel = isLocalAi ? this.config.aiModel : this.config.geminiModel;
     const started = performance.now();
     const trace = (stage: string, status: number | null, category: string, reason?: string) => {
-      console.log(JSON.stringify({ event: 'ai_planner', stage, model: this.config.geminiModel,
+      console.log(JSON.stringify({ event: 'ai_planner', stage, model: activeModel,
         requestId:requestContext.getStore()?.id ?? null,
         durationMs: Math.round(performance.now() - started), status, category, ...(reason ? { reason } : {}) }));
     };
-    if (!this.config.geminiKey) {
+    if (!isLocalAi && !this.config.geminiKey) {
       trace('configuration', null, 'missing_key');
       throw new ServiceUnavailableException('AI chưa được cấu hình trên server.');
+    }
+    if (isLocalAi) {
+      const prompt = buildCompactPrompt(text, candidates, clientDate);
+      const baseUrl = this.config.aiBaseUrl.replace(/\/+$/, '');
+      const endpoint = baseUrl.endsWith('/v1') ? `${baseUrl}/chat/completions` : `${baseUrl}/v1/chat/completions`;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (this.config.aiApiKey) headers['Authorization'] = `Bearer ${this.config.aiApiKey}`;
+      trace('provider_request', null, 'started');
+      let response: Response;
+      try {
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            model: this.config.aiModel,
+            messages: [
+              { role: 'system', content: prompt },
+              { role: 'user', content: text },
+            ],
+            response_format: { type: 'json_object' },
+            temperature: 0.1,
+          }),
+          signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(30000)]) : AbortSignal.timeout(30000),
+        });
+      } catch (error) {
+        if (signal?.aborted) throw new RequestTimeoutException({ code: 'REQUEST_CANCELLED', message: 'Yêu cầu đã được hủy.' });
+        if (error instanceof Error && error.name === 'TimeoutError') {
+          trace('provider_response', null, 'timeout');
+          throw new GatewayTimeoutException('AI phản hồi quá lâu. Vui lòng thử lại.');
+        }
+        trace('provider_response', null, 'network_or_tls');
+        throw new ServiceUnavailableException('Không kết nối được AI. Vui lòng thử lại.');
+      }
+      if (!response.ok) {
+        trace('provider_response', response.status, 'provider_failure');
+        throw new ServiceUnavailableException('AI tạm thời không sẵn sàng.');
+      }
+      trace('provider_response', response.status, 'success');
+      try {
+        const body = await response.json() as {
+          choices?: Array<{ message?: { content?: string } }>;
+          usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+        };
+        if (body.usage) {
+          console.log(JSON.stringify({
+            event: 'ai_provider_usage',
+            requestId: requestContext.getStore()?.id ?? null,
+            model: this.config.aiModel,
+            promptTokenCount: body.usage.prompt_tokens,
+            candidatesTokenCount: body.usage.completion_tokens,
+            totalTokenCount: body.usage.total_tokens,
+          }));
+        }
+        let rawContent = body.choices?.[0]?.message?.content?.trim() ?? '';
+        if (!rawContent) throw new Error('AI_INVALID_SCHEMA');
+        if (rawContent.startsWith('```')) {
+          rawContent = rawContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+        }
+        const plan = validatePlan(JSON.parse(rawContent));
+        trace('schema_validation', response.status, 'valid');
+        return plan;
+      } catch {
+        trace('schema_validation', response.status, 'invalid_schema');
+        throw new HttpException({ code: 'AI_INVALID_SCHEMA', message: 'AI trả dữ liệu không hợp lệ.' }, 502);
+      }
     }
     const prompt = buildPlannerPrompt(text, candidates, clientDate);
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.config.geminiModel)}:generateContent`;
