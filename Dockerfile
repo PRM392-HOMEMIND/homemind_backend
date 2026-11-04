@@ -5,12 +5,12 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
 COPY --chown=node:node prisma ./prisma
 COPY prisma.config.ts ./
 COPY --chown=node:node scripts/ci-migrate.cjs scripts/ci-upgrade.cjs scripts/load-env.cjs scripts/admin-operator.cjs scripts/admin-audit-maintain.cjs scripts/admin-data-scope.cjs ./scripts/
 COPY --chown=node:node scripts/reviewer-bootstrap.cjs ./scripts/
-RUN DATABASE_URL=postgresql://placeholder:placeholder@invalid:5432/homemind npm run prisma:generate
+RUN DATABASE_URL=postgresql://placeholder:placeholder@invalid:5432/homemind DIRECT_URL=postgresql://placeholder:placeholder@invalid:5432/homemind npm run prisma:generate
 
 FROM dependencies AS build
 COPY tsconfig*.json nest-cli.json ./

@@ -19,6 +19,14 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  DIRECT_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  MIGRATION_DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
+  AUTH_ACCESS_SECRET: homemind_access_secret_super_secure_random_key_32bytes_1
+  AUTH_REFRESH_SECRET: homemind_refresh_secret_super_secure_random_key_32bytes_2
+  AUTH_RESET_SECRET: homemind_reset_secret_super_secure_random_key_32bytes_3
+
 jobs:
   static-checks:
     name: Lint & Typecheck
