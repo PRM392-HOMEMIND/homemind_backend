@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage.enabled --coverage.provider=v8 --coverage.reporter=json-summary --coverage.include=src/assistant/assistant.service.ts --coverage.include=src/billing/** --coverage.include=src/me/** --coverage.include=src/common/dto.ts",
     "prisma:generate": "prisma generate",
     "db:demo:seed": "node scripts/seed-demo-data.cjs",
+    "admin:create": "node scripts/create-admin.cjs",
     "db:deploy": "prisma migrate deploy",
     "db:migrate": "prisma migrate deploy",
     "db:status": "prisma migrate status"

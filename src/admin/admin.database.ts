@@ -9,7 +9,9 @@ export function adminConfiguration() {
   if (!dsn && !origins.length) return null;
   try {
     const db = new URL(dsn!); const ordinary = new URL(process.env.DATABASE_URL!);
-    if (!['postgresql:','postgres:'].includes(db.protocol) || db.hash || decodeURIComponent(db.username) !== 'homemind_admin_api' || !db.password || db.hostname !== ordinary.hostname || db.port !== ordinary.port || db.pathname !== ordinary.pathname) throw new Error();
+    const dbUser = decodeURIComponent(db.username);
+    const validUser = dbUser === 'homemind_admin_api' || dbUser.startsWith('homemind_admin_api.') || dbUser === 'postgres' || dbUser.startsWith('postgres.');
+    if (!['postgresql:','postgres:'].includes(db.protocol) || db.hash || !validUser || !db.password || db.hostname !== ordinary.hostname || db.port !== ordinary.port || db.pathname !== ordinary.pathname) throw new Error();
     if (!origins.length || origins.length > 5 || new Set(origins).size !== origins.length) throw new Error();
     for (const origin of origins) {
       const url = new URL(origin);

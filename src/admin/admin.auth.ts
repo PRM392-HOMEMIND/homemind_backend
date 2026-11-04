@@ -138,6 +138,15 @@ export class AdminErrorFilter implements ExceptionFilter {
       if(!fields.length)fields.push({field:'request',code:'INVALID_VALUE'});
     }
     if(status===401)setCookie(res,ADMIN_COOKIE,'',0);
+    const origin = req.headers?.origin;
+    if (origin && !res.getHeader('Access-Control-Allow-Origin')) {
+      const allowed = (process.env.ADMIN_WEB_ORIGINS || '').split(',').map(x => x.trim()).filter(Boolean);
+      if (allowed.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Expose-Headers', 'X-Request-ID');
+      }
+    }
     res.setHeader('Cache-Control','private, no-store');res.status(status).json({error:{code,message:status===400?'Invalid request.':status===503?'Admin unavailable.':'Request denied.',requestId:req.requestId || randomUUID(),fields}});
   }
 }
