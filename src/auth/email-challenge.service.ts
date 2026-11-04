@@ -177,3 +177,5 @@ export class EmailChallengeService {
     return true;
   }
 }
+
+// Handled by Le Nguyen Quoc Hung
