@@ -11,7 +11,7 @@ export type AdminRequest = Request & { admin?:Session; adminToken?:string; reque
 const digest = (x:string) => createHash('sha256').update(x).digest('hex');
 function equal(a:string,b:string) { const x=Buffer.from(a),y=Buffer.from(b); return x.length===y.length && timingSafeEqual(x,y); }
 function cookie(req:Request,name:string) { const parts=(req.headers.cookie||'').split(';').map(x=>x.trim()).filter(x=>x.startsWith(name+'=')); return parts.length===1?parts[0].slice(name.length+1):''; }
-function setCookie(res:Response,name:string,value:string,maxAge:number) { res.cookie(name,value,{secure:true,httpOnly:true,sameSite:'strict',path:'/',maxAge}); }
+function setCookie(res:Response,name:string,value:string,maxAge:number) { res.cookie(name,value,{secure:true,httpOnly:true,sameSite:'none',path:'/',maxAge}); }
 @Injectable()
 export class AdminAuth {
   private readonly dummy = argon2.hash(randomBytes(32),{type:argon2.argon2id});
@@ -26,7 +26,8 @@ export class AdminAuth {
     const origin=req.headers.origin;
     if (origin && !this.db.config?.origins.includes(origin)) throw new ForbiddenException({code:'ADMIN_ORIGIN_DENIED',message:'Origin not allowed.'});
     if (origin) {res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Access-Control-Allow-Credentials','true');res.setHeader('Access-Control-Expose-Headers','X-Request-ID');}
-    if (!['GET','HEAD','OPTIONS'].includes(req.method) && (!origin || req.headers['sec-fetch-site']==='cross-site')) throw new ForbiddenException({code:'ADMIN_ORIGIN_DENIED',message:'Approved Origin required.'});
+    const approvedOrigin = (origin && this.db.config?.origins.includes(origin)) || req.headers['sec-fetch-site']==='same-origin' || req.headers['sec-fetch-site']==='same-site';
+    if (!['GET','HEAD','OPTIONS'].includes(req.method) && !approvedOrigin) throw new ForbiddenException({code:'ADMIN_ORIGIN_DENIED',message:'Approved Origin required.'});
   }
   async csrf(req:AdminRequest,res:Response) {
     this.db.available();
