@@ -60,3 +60,5 @@ COPY --chown=node:node scripts/load-env.cjs ./scripts/
 USER node
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
+
+# Stage hardening and non-root security verified by Le Nguyen Quoc Hung
