@@ -1,0 +1,483 @@
+{
+  "catalogVersion": "1.0.0",
+  "itemCount": 53,
+  "items": [
+    {
+      "name": "Nước mắm Nam Ngư Đệ Nhị 900ml",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 32000,
+      "shelfLifeDays": 365,
+      "barcode": "8936017362011"
+    },
+    {
+      "name": "Nước mắm Chinsu Cá Hồi 500ml",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 48000,
+      "shelfLifeDays": 365,
+      "barcode": "8936017362028"
+    },
+    {
+      "name": "Dầu ăn Tường An Cooking Oil 1L",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 45000,
+      "shelfLifeDays": 730,
+      "barcode": "8934563138128"
+    },
+    {
+      "name": "Dầu ăn Simply Đậu Nành 1L",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 58000,
+      "shelfLifeDays": 730,
+      "barcode": "8934563148127"
+    },
+    {
+      "name": "Hạt nêm Knorr Thịt Thăn Xương Ống 400g",
+      "category": "Gia vị",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 38000,
+      "shelfLifeDays": 365,
+      "barcode": "8934868142019"
+    },
+    {
+      "name": "Hạt nêm Aji-ngon Heo 400g",
+      "category": "Gia vị",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 35000,
+      "shelfLifeDays": 365,
+      "barcode": "8934561010105"
+    },
+    {
+      "name": "Bột ngọt Ajinomoto 454g",
+      "category": "Gia vị",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 34000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934561020203"
+    },
+    {
+      "name": "Tương ớt Chinsu Chai 250g",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 15000,
+      "shelfLifeDays": 270,
+      "barcode": "8936017362059"
+    },
+    {
+      "name": "Tương cà Chinsu Chai 250g",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 16000,
+      "shelfLifeDays": 270,
+      "barcode": "8936017362066"
+    },
+    {
+      "name": "Nước tương Chinsu Tỏi Ớt 330ml",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 19000,
+      "shelfLifeDays": 365,
+      "barcode": "8936017362073"
+    },
+    {
+      "name": "Nước tương Maggi Đậm Đặc 700ml",
+      "category": "Gia vị",
+      "unit": "chai",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 31000,
+      "shelfLifeDays": 365,
+      "barcode": "8934804022412"
+    },
+    {
+      "name": "Muối I-ốt Bạc Liêu 1kg",
+      "category": "Gia vị",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 9000,
+      "shelfLifeDays": 1095,
+      "barcode": "8936034120014"
+    },
+    {
+      "name": "Đường tinh luyện Biên Hòa Daily 1kg",
+      "category": "Gia vị",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 28000,
+      "shelfLifeDays": 730,
+      "barcode": "8934588012014"
+    },
+    {
+      "name": "Tiêu đen xay Phú Quốc 100g",
+      "category": "Gia vị",
+      "unit": "hũ",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 35000,
+      "shelfLifeDays": 730,
+      "barcode": "8938501234012"
+    },
+    {
+      "name": "Gạo ST25 Ông Cua Túi 5kg",
+      "category": "Lương thực",
+      "unit": "túi",
+      "storageLocation": "Thùng gạo",
+      "priceVnd": 185000,
+      "shelfLifeDays": 180,
+      "barcode": "8936072180015"
+    },
+    {
+      "name": "Gạo thơm Jasmine Lộc Trời 5kg",
+      "category": "Lương thực",
+      "unit": "túi",
+      "storageLocation": "Thùng gạo",
+      "priceVnd": 135000,
+      "shelfLifeDays": 180,
+      "barcode": "8936072180022"
+    },
+    {
+      "name": "Mì Hảo Hảo Tôm Chua Cay 75g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 4500,
+      "shelfLifeDays": 150,
+      "barcode": "8934563188123"
+    },
+    {
+      "name": "Mì Đệ Nhất Thịt Bằm 82g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 7500,
+      "shelfLifeDays": 150,
+      "barcode": "8934563188208"
+    },
+    {
+      "name": "Mì trộn Omachi Xốt Spaghetti 105g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 12000,
+      "shelfLifeDays": 150,
+      "barcode": "8936017362103"
+    },
+    {
+      "name": "Mì khoai tây Omachi Sườn Hầm 80g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 9000,
+      "shelfLifeDays": 150,
+      "barcode": "8936017362110"
+    },
+    {
+      "name": "Phở bò Cung Đình Gói 68g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 8500,
+      "shelfLifeDays": 180,
+      "barcode": "8934563188314"
+    },
+    {
+      "name": "Hủ tiếu Nam Vang Vifon 65g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 8000,
+      "shelfLifeDays": 180,
+      "barcode": "8934563188406"
+    },
+    {
+      "name": "Bún tươi khô Safoco 300g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 16000,
+      "shelfLifeDays": 365,
+      "barcode": "8934563198122"
+    },
+    {
+      "name": "Miến dong riềng sạch 500g",
+      "category": "Lương thực",
+      "unit": "gói",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 45000,
+      "shelfLifeDays": 365,
+      "barcode": "8934563198207"
+    },
+    {
+      "name": "Sữa tươi tiệt trùng Vinamilk Có Đường 1L",
+      "category": "Sữa & Chế phẩm",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 36000,
+      "shelfLifeDays": 180,
+      "barcode": "8934673121011"
+    },
+    {
+      "name": "Sữa tươi tiệt trùng TH True MILK Ít Đường 1L",
+      "category": "Sữa & Chế phẩm",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 39000,
+      "shelfLifeDays": 180,
+      "barcode": "8936036010118"
+    },
+    {
+      "name": "Sữa chua Vinamilk Có Đường Lốc 4 Hộp",
+      "category": "Sữa & Chế phẩm",
+      "unit": "lốc",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 28000,
+      "shelfLifeDays": 45,
+      "barcode": "8934673132017"
+    },
+    {
+      "name": "Sữa đặc có đường Ông Thọ Đỏ 380g",
+      "category": "Sữa & Chế phẩm",
+      "unit": "lon",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 26000,
+      "shelfLifeDays": 365,
+      "barcode": "8934673141019"
+    },
+    {
+      "name": "Trứng gà công nghiệp Ba Huân Hộp 10 Quả",
+      "category": "Thực phẩm tươi",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 32000,
+      "shelfLifeDays": 30,
+      "barcode": "8936012340112"
+    },
+    {
+      "name": "Trứng vịt tươi Ba Huân Hộp 10 Quả",
+      "category": "Thực phẩm tươi",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 38000,
+      "shelfLifeDays": 30,
+      "barcode": "8936012340129"
+    },
+    {
+      "name": "Đậu phụ Mơ làng 3 bìa",
+      "category": "Thực phẩm tươi",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 15000,
+      "shelfLifeDays": 3,
+      "barcode": "8936012340204"
+    },
+    {
+      "name": "Thịt ba chỉ heo sạch CP 500g",
+      "category": "Thịt & Thủy sản",
+      "unit": "khay",
+      "storageLocation": "Ngăn đông",
+      "priceVnd": 75000,
+      "shelfLifeDays": 90,
+      "barcode": "8935012301011"
+    },
+    {
+      "name": "Ức gà phi lê CP 500g",
+      "category": "Thịt & Thủy sản",
+      "unit": "khay",
+      "storageLocation": "Ngăn đông",
+      "priceVnd": 45000,
+      "shelfLifeDays": 90,
+      "barcode": "8935012301028"
+    },
+    {
+      "name": "Cá hồi phi lê Nauy 300g",
+      "category": "Thịt & Thủy sản",
+      "unit": "khay",
+      "storageLocation": "Ngăn đông",
+      "priceVnd": 165000,
+      "shelfLifeDays": 60,
+      "barcode": "8935012301035"
+    },
+    {
+      "name": "Bia Larue Thùng 24 Lon 330ml",
+      "category": "Đồ uống",
+      "unit": "thùng",
+      "storageLocation": "Kho sau",
+      "priceVnd": 240000,
+      "shelfLifeDays": 365,
+      "barcode": "8934822101011"
+    },
+    {
+      "name": "Bia Tiger Crystal Thùng 24 Lon 330ml",
+      "category": "Đồ uống",
+      "unit": "thùng",
+      "storageLocation": "Kho sau",
+      "priceVnd": 395000,
+      "shelfLifeDays": 365,
+      "barcode": "8934822102025"
+    },
+    {
+      "name": "Nước ngọt Coca-Cola Thùng 24 Lon 320ml",
+      "category": "Đồ uống",
+      "unit": "thùng",
+      "storageLocation": "Kho sau",
+      "priceVnd": 210000,
+      "shelfLifeDays": 365,
+      "barcode": "8935049500010"
+    },
+    {
+      "name": "Nước khoáng La Vie Chai 1.5L",
+      "category": "Đồ uống",
+      "unit": "chai",
+      "storageLocation": "Kệ bếp",
+      "priceVnd": 10500,
+      "shelfLifeDays": 730,
+      "barcode": "8934588021016"
+    },
+    {
+      "name": "Trà xanh Không Độ Chai 455ml",
+      "category": "Đồ uống",
+      "unit": "chai",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 10000,
+      "shelfLifeDays": 365,
+      "barcode": "8934588031015"
+    },
+    {
+      "name": "Cà phê hòa tan G7 3in1 Hộp 18 Gói",
+      "category": "Đồ uống",
+      "unit": "hộp",
+      "storageLocation": "Tủ bếp",
+      "priceVnd": 58000,
+      "shelfLifeDays": 730,
+      "barcode": "8935024110014"
+    },
+    {
+      "name": "Cà chua bi Đà Lạt 500g",
+      "category": "Rau củ",
+      "unit": "hộp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 25000,
+      "shelfLifeDays": 7,
+      "barcode": "8936082100114"
+    },
+    {
+      "name": "Khoai tây Đà Lạt Túi 1kg",
+      "category": "Rau củ",
+      "unit": "túi",
+      "storageLocation": "Kệ khô",
+      "priceVnd": 35000,
+      "shelfLifeDays": 21,
+      "barcode": "8936082100121"
+    },
+    {
+      "name": "Hành tây trắng Túi 1kg",
+      "category": "Rau củ",
+      "unit": "túi",
+      "storageLocation": "Kệ khô",
+      "priceVnd": 22000,
+      "shelfLifeDays": 30,
+      "barcode": "8936082100138"
+    },
+    {
+      "name": "Tỏi Lý Sơn Túi 500g",
+      "category": "Rau củ",
+      "unit": "túi",
+      "storageLocation": "Kệ khô",
+      "priceVnd": 65000,
+      "shelfLifeDays": 90,
+      "barcode": "8936082100145"
+    },
+    {
+      "name": "Bắp cải thảo Đà Lạt 1 bắp",
+      "category": "Rau củ",
+      "unit": "bắp",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 20000,
+      "shelfLifeDays": 10,
+      "barcode": "8936082100152"
+    },
+    {
+      "name": "Táo Envy New Zealand 1kg",
+      "category": "Trái cây",
+      "unit": "túi",
+      "storageLocation": "Tủ lạnh",
+      "priceVnd": 120000,
+      "shelfLifeDays": 14,
+      "barcode": "8936082100206"
+    },
+    {
+      "name": "Chuối tiêu hồng 1 nải",
+      "category": "Trái cây",
+      "unit": "nải",
+      "storageLocation": "Kệ bếp",
+      "priceVnd": 30000,
+      "shelfLifeDays": 5,
+      "barcode": "8936082100213"
+    },
+    {
+      "name": "Nước rửa chén Sunlight Trà Xanh 750g",
+      "category": "Đồ dùng gia đình",
+      "unit": "chai",
+      "storageLocation": "Kệ bếp",
+      "priceVnd": 27000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934868151011"
+    },
+    {
+      "name": "Nước lau sàn Sunlight Hương Hoa Hạ 1kg",
+      "category": "Đồ dùng gia đình",
+      "unit": "chai",
+      "storageLocation": "Nhà tắm",
+      "priceVnd": 32000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934868152018"
+    },
+    {
+      "name": "Nước giặt OMO Matic Cửa Trên Túi 3.6kg",
+      "category": "Đồ dùng gia đình",
+      "unit": "túi",
+      "storageLocation": "Khu giặt",
+      "priceVnd": 185000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934868153015"
+    },
+    {
+      "name": "Nước xả vải Comfort Đậm Đặc Túi 3.2L",
+      "category": "Đồ dùng gia đình",
+      "unit": "túi",
+      "storageLocation": "Khu giặt",
+      "priceVnd": 195000,
+      "shelfLifeDays": 730,
+      "barcode": "8934868154012"
+    },
+    {
+      "name": "Kem đánh răng Closeup Tinh Thể Băng Tuyết 230g",
+      "category": "Chăm sóc cá nhân",
+      "unit": "tuýp",
+      "storageLocation": "Nhà tắm",
+      "priceVnd": 42000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934868161010"
+    },
+    {
+      "name": "Dầu gội Clear Men Mát Lạnh Bạc Hà 630g",
+      "category": "Chăm sóc cá nhân",
+      "unit": "chai",
+      "storageLocation": "Nhà tắm",
+      "priceVnd": 175000,
+      "shelfLifeDays": 1095,
+      "barcode": "8934868162017"
+    }
+  ]
+}
