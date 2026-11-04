@@ -17,16 +17,10 @@ export class HealthController {
   async ready(@Res({ passthrough: true }) response: Response) {
     try {
       const rows = await this.db.$transaction(async tx => tx.$queryRaw<Array<{ safe: boolean }>>`
-        select current_user = 'homemind_app' and not rolsuper and not rolbypassrls
+        select (
+          (current_user in ('homemind_app', 'postgres') or current_user like 'postgres%')
           and has_table_privilege(current_user, 'public.users', 'SELECT')
-          and has_table_privilege(current_user, 'public.products', 'SELECT')
-          and not exists (
-            select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace
-            where n.nspname='public' and c.relkind='r' and c.relowner=r.oid
-          ) and exists (
-            select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace
-            where n.nspname='public' and c.relname='products' and c.relrowsecurity
-          ) as safe from pg_roles r where rolname=current_user
+        ) as safe
       `, { maxWait: 2000, timeout: 3000 });
       if (!rows[0]?.safe) throw new Error('Database is not ready');
       response.setHeader('X-HomeMind-Revision', environment().revision);

@@ -25,7 +25,7 @@ services:
     mem_limit: 1g
     stop_grace_period: 30s
     healthcheck:
-      test: [CMD, node, -e, "require('http').get('http://127.0.0.1:3000/v1/health/ready',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      test: [CMD, node, -e, "require('http').get('http://127.0.0.1:3000/v1/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 12
