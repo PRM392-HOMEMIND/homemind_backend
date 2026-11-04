@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
   }
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   app.useGlobalFilters(new ApiErrorFilter());
-  if (!config.production) {
+  if (process.env.ENABLE_SWAGGER !== 'false') {
     const document = SwaggerModule.createDocument(app, new DocumentBuilder()
     .setTitle('HomeMind API')
     .setDescription('API pilot HomeMind. Dùng HomeMind access token cho tất cả route nghiệp vụ; các thao tác ghi thủ công cần Idempotency-Key.')
