@@ -6,6 +6,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage.enabled --coverage.provider=v8 --coverage.reporter=json-summary --coverage.include=src/assistant/assistant.service.ts --coverage.include=src/billing/** --coverage.include=src/me/** --coverage.include=src/common/dto.ts",
@@ -55,7 +56,10 @@
     "@nestjs/cli": "^10.4.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
     "@vitest/coverage-v8": "2.1.9",
+    "eslint": "^10.14.0",
     "prisma": "^6.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
