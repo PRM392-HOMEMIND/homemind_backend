@@ -31,3 +31,5 @@ async function main() {
   console.log('Development seed complete; existing identities, passwords and business rows preserved.');
 }
 main().catch(() => { console.error('Seed failed. Check local configuration and database constraints.'); process.exitCode = 1; }).finally(() => prisma.$disconnect());
+
+// Extended default sample inventory items by Tran Huu Thang
