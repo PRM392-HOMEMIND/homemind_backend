@@ -80,17 +80,19 @@ Server sẽ lắng nghe tại http://127.0.0.1:3000.
 
 ---
 
-## 🐳 Triển khai bằng Docker
+## 🐳 Triển khai Production trên AWS EC2 với Docker Compose
 
-Sử dụng Docker Compose trong thư mục deploy/:
-`ash
+Stack sản phẩm được tối ưu hóa tinh gọn cho AWS EC2 kết hợp **Supabase Cloud PostgreSQL** và **Nginx Reverse Proxy**:
+```bash
 docker compose -f deploy/compose.yaml up -d
-`
-Gồm 3 service:
-1. db: PostgreSQL với cấu hình an toàn và script phân quyền role tối thiểu.
-2. migrate: Container chuyên dụng tự động migrate schema trước khi app chạy.
-3. pi: Container backend chạy chế độ read-only filesystem, dropped privileges.
-
+```
+Gồm các thành phần:
+1. **`api` (Backend NestJS)**: Chạy ứng dụng NestJS ở chế độ an toàn (read-only filesystem, dropped root privileges), kết nối trực tiếp cơ sở dữ liệu Supabase Cloud qua Connection Pooling.
+2. **`nginx` (Reverse Proxy & SSL Gateway)**: Cổng tiếp nhận duy nhất từ Internet (cổng 80 & 443), bảo vệ backend nội bộ, định tuyến tên miền `homemind.ddns.net`.
+3. **`migrate` (One-shot Tool)**: Áp dụng Prisma migration lên Supabase khi cần:
+   ```bash
+   docker compose -f deploy/compose.yaml run --rm migrate
+   ```
 ---
 
 ## 📜 Giấy phép

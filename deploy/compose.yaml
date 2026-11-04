@@ -1,47 +1,26 @@
 name: homemind
+
 services:
-  db:
-    image: ${DB_IMAGE:?DB_IMAGE must be an immutable tested digest}
-    restart: unless-stopped
-    command: [postgres, -c, log_min_error_statement=panic, -c, log_error_verbosity=terse]
-    environment:
-      POSTGRES_DB: homemind
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/admin_password
-      PGDATA: /var/lib/postgresql/18/docker
-    secrets: [admin_password, migrator_password, app_password]
-    volumes:
-      - postgres_data:/var/lib/postgresql
-      - ./db/init-roles.sh:/docker-entrypoint-initdb.d/10-homemind-roles.sh:ro
-    networks: [database]
-    shm_size: 256m
-    cpus: 2
-    mem_limit: 2g
-    healthcheck:
-      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U postgres -d homemind']
-      interval: 10s
-      timeout: 5s
-      retries: 12
-    logging: &logging
-      driver: json-file
-      options: {max-size: 10m, max-file: '5'}
+  # 1. Backend Core NestJS (Kết nối Supabase Cloud)
   api:
-    image: ${APP_IMAGE:?APP_IMAGE must be an immutable digest}
+    image: ${APP_IMAGE:-homemind-api:latest}
+    build:
+      context: ..
+      target: runtime
     restart: unless-stopped
     init: true
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
-    env_file: ['${SECRETS_DIRECTORY:-/etc/homemind}/api.env']
+    env_file:
+      - ${ENV_FILE:-../.env}
     environment:
-      RELEASE_SHA: ${RELEASE_SHA:?RELEASE_SHA is required}
-    ports: ['127.0.0.1:3000:3000']
+      RELEASE_SHA: ${RELEASE_SHA:-development}
+    expose:
+      - '3000'
     networks:
-      database: {}
-      egress: {gw_priority: 1}
-    depends_on:
-      db: {condition: service_healthy}
+      - homemind-network
     cpus: 2
     mem_limit: 1g
     stop_grace_period: 30s
@@ -50,40 +29,55 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
-      start_period: 30s
+      start_period: 20s
+    logging: &logging
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+
+  # 2. Nginx Reverse Proxy (Cổng tiếp nhận duy nhất từ Internet cho homemind.ddns.net)
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/api.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/log-format.conf:/etc/nginx/conf.d/00-log-format.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - certbot_acme:/var/www/homemind-acme:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - homemind-network
     logging: *logging
+
+  # 3. Migration Runner (Công cụ one-shot chạy migration lên Supabase qua DIRECT_URL)
   migrate:
-    image: ${MIGRATION_IMAGE:?MIGRATION_IMAGE must be an immutable digest}
+    image: ${MIGRATION_IMAGE:-homemind-migrate:latest}
+    build:
+      context: ..
+      target: migrator
     profiles: [tools]
     init: true
     read_only: true
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     tmpfs: [/tmp]
-    env_file: ['${SECRETS_DIRECTORY:-/etc/homemind}/migration.env']
-    networks: [database]
-    depends_on:
-      db: {condition: service_healthy}
+    env_file:
+      - ${ENV_FILE:-../.env}
+    networks:
+      - homemind-network
     cpus: 2
     mem_limit: 1g
     logging: *logging
-volumes:
-  postgres_data:
-    name: homemind_postgres18_data
-networks:
-  database:
-    internal: true
-    ipam:
-      config: [{subnet: 172.28.43.0/24}]
-  egress:
-    ipam:
-      config: [{subnet: 172.28.42.0/24, gateway: 172.28.42.1}]
-secrets:
-  admin_password:
-    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-admin-password
-  migrator_password:
-    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-migrator-password
-  app_password:
-    file: ${SECRETS_DIRECTORY:-/etc/homemind}/db-app-password
 
-    # Verified persistent volume mapping for postgresql storage by Tran Huu Thang
+volumes:
+  certbot_acme:
+    name: homemind_certbot_acme
+
+networks:
+  homemind-network:
+    name: homemind_network
+    driver: bridge
