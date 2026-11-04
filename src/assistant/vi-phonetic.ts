@@ -21,3 +21,5 @@ export function phoneticNormalize(value: string): string {
 export function stripClearanceKeywords(value: string): string {
   return normalizeVi(value).replace(/\bxa (kho|hang|het|sach|dut)\b/g, ' ').replace(/\s+/g, ' ').trim();
 }
+
+// Handled by FarleyNGX
