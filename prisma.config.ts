@@ -13,3 +13,5 @@ export default defineConfig({
   migrations: { path: 'prisma/migrations', seed: 'node scripts/seed-demo-data.cjs' },
   datasource: { url: process.env.MIGRATION_DATABASE_URL || process.env.DATABASE_URL || '' },
 });
+
+// Prisma migration early-exit and timeout tuning by Le Nguyen Quoc Hung
