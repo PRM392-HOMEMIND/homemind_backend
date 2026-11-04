@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import * as nodemailer from 'nodemailer';
 import { emailConfig } from './email.config';
 
 export type EmailContent = { subject: string; html: string; text: string };
@@ -30,9 +31,54 @@ export function mimeEmail(from: string, to: string, content: EmailContent, messa
 export class InfobipProvider {
   private readonly config = emailConfig();
   private active = 0;
-  available() { return this.config.mode === 'infobip'; }
+  private smtpTransporter: nodemailer.Transporter | null = null;
+
+  private getSmtpTransporter() {
+    if (!this.smtpTransporter) {
+      this.smtpTransporter = nodemailer.createTransport({
+        host: this.config.smtpHost,
+        port: this.config.smtpPort,
+        secure: this.config.smtpSecure,
+        auth: {
+          user: this.config.smtpUser,
+          pass: this.config.smtpPass,
+        },
+      });
+    }
+    return this.smtpTransporter;
+  }
+
+  available() { return ['infobip', 'smtp', 'development'].includes(this.config.mode); }
+
   async send(to: string, content: EmailContent, messageId: string, security = false): Promise<EmailOutcome> {
     if (!this.available()) return { state: 'failed', messageId, code: 'EMAIL_DISABLED' };
+
+    if (this.config.mode === 'development') {
+      console.log(`\n================== [EMAIL DEV LOG] ==================`);
+      console.log(`To: ${to}`);
+      console.log(`Subject: ${content.subject}`);
+      console.log(`Body:\n${content.text}`);
+      console.log(`====================================================\n`);
+      return { state: 'delivered', messageId, code: 'DEV_LOGGED' };
+    }
+
+    if (this.config.mode === 'smtp') {
+      try {
+        const transporter = this.getSmtpTransporter();
+        await transporter.sendMail({
+          from: this.config.smtpFrom,
+          to,
+          subject: content.subject,
+          text: content.text,
+          html: content.html,
+        });
+        return { state: 'delivered', messageId, code: 'SMTP_SENT' };
+      } catch (error) {
+        console.error('SMTP send error:', error);
+        return { state: 'failed', messageId, code: 'SMTP_ERROR', retryable: true };
+      }
+    }
+
     if (this.active >= this.config.concurrency) return { state: 'failed', messageId, code: 'EMAIL_BUSY', retryable: true };
     this.active++;
     try {
@@ -53,8 +99,12 @@ export class InfobipProvider {
       return { state: 'unknown', messageId, code: 'EMAIL_SUBMIT_UNKNOWN' };
     } finally { this.active--; }
   }
+
   async report(messageId: string): Promise<EmailOutcome | null> {
     if (!this.available()) return null;
+    if (this.config.mode === 'smtp' || this.config.mode === 'development') {
+      return { state: 'delivered', messageId, code: 'DELIVERED' };
+    }
     // Filter by our owned message only; never drain another application's one-shot reports.
     const response = await fetch(this.config.baseUrl + '/email/4/reports?messageId=' + encodeURIComponent(messageId), {
       redirect: 'error', signal: AbortSignal.timeout(this.config.timeoutMs), headers: { Authorization: 'App ' + this.config.key, Accept: 'application/json' },
