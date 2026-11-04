@@ -19,7 +19,7 @@ RUN gosu postgres id -u | grep -v '^0$'
 FROM scratch
 COPY --from=patched / /
 ARG RELEASE_SHA=development
-LABEL org.opencontainers.image.source="https://github.com/QuangVMZu/HomeMind" org.opencontainers.image.revision="${RELEASE_SHA}"
+LABEL org.opencontainers.image.source="https://github.com/PRM392-HOMEMIND/homemind_backend" org.opencontainers.image.revision="${RELEASE_SHA}"
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/18/bin \
     GOSU_VERSION=1.19 LANG=en_US.utf8 PG_MAJOR=18 PG_VERSION=18.6-1.pgdg13+2 \
     PGDATA=/var/lib/postgresql/18/docker

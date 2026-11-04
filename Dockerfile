@@ -38,7 +38,7 @@ WORKDIR /app
 
 FROM deployment-base AS migrator
 ARG RELEASE_SHA=development
-LABEL org.opencontainers.image.source="https://github.com/QuangVMZu/HomeMind" org.opencontainers.image.revision="${RELEASE_SHA}"
+LABEL org.opencontainers.image.source="https://github.com/PRM392-HOMEMIND/homemind_backend" org.opencontainers.image.revision="${RELEASE_SHA}"
 ENV NODE_ENV=production
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node prisma ./prisma
@@ -50,7 +50,7 @@ CMD ["./node_modules/.bin/prisma", "migrate", "deploy"]
 
 FROM deployment-base AS runtime
 ARG RELEASE_SHA=development
-LABEL org.opencontainers.image.source="https://github.com/QuangVMZu/HomeMind" org.opencontainers.image.revision="${RELEASE_SHA}"
+LABEL org.opencontainers.image.source="https://github.com/PRM392-HOMEMIND/homemind_backend" org.opencontainers.image.revision="${RELEASE_SHA}"
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 COPY --from=runtime-dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist

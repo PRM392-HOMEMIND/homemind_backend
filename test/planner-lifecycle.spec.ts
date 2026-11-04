@@ -5,6 +5,10 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
 describe('AI provider lifecycle: mocked transport only', () => {
   function transport() {
     vi.stubEnv('GEMINI_API_KEY', 'mock-provider-never-sent-to-network');
+    vi.stubEnv('DATABASE_URL', 'postgresql://homemind_app:fixture@127.0.0.1:5432/homemind');
+    vi.stubEnv('AUTH_ACCESS_SECRET', 'test_access_secret_longer_than_32_characters_123456');
+    vi.stubEnv('AUTH_REFRESH_SECRET', 'test_refresh_secret_longer_than_32_characters_123456');
+    vi.stubEnv('AUTH_RESET_SECRET', 'test_reset_secret_longer_than_32_characters_123456');
     let entered!: () => void;
     const ready = new Promise<void>(resolve => entered = resolve);
     const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, options) => {

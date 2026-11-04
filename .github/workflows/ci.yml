@@ -105,7 +105,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
           MIGRATION_DATABASE_URL: postgresql://postgres:testpassword123@127.0.0.1:5432/homemind
         run: |
-          psql "postgresql://postgres:testpassword123@127.0.0.1:5432/homemind" -c "CREATE ROLE homemind_migrator WITH LOGIN PASSWORD 'testpassword123'; CREATE ROLE homemind_app WITH LOGIN PASSWORD 'testpassword123'; GRANT ALL PRIVILEGES ON DATABASE homemind TO homemind_migrator; GRANT USAGE ON SCHEMA public TO homemind_app;"
+          psql "postgresql://postgres:testpassword123@127.0.0.1:5432/homemind" -c "CREATE ROLE homemind_migrator WITH LOGIN PASSWORD 'testpassword123'; CREATE ROLE homemind_app WITH LOGIN PASSWORD 'testpassword123'; GRANT ALL PRIVILEGES ON DATABASE homemind TO homemind_migrator; GRANT USAGE ON SCHEMA public TO homemind_app; GRANT homemind_migrator TO postgres; GRANT homemind_app TO postgres;"
           npx prisma migrate deploy
 
       - name: Run Integration test suite

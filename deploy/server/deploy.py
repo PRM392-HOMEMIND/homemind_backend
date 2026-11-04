@@ -9,8 +9,8 @@ from env_revisions import Revisions, valid_revision
 
 ROOT=pathlib.Path('/opt/homemind')
 STATE=ROOT/'release.json'
-REPOSITORY='QuangVMZu/HomeMind'
-IMAGE_PREFIX='ghcr.io/quangvmzu/'
+REPOSITORY='PRM392-HOMEMIND/homemind_backend'
+IMAGE_PREFIX='ghcr.io/prm392-homemind/'
 
 def validate_payload(payload):
     if set(payload)!=set(['repository','sha','run_id','api_image','migration_image','database_image','env_revision','token']): raise ValueError('Unexpected deployment fields')
@@ -270,7 +270,7 @@ def deploy(payload):
         registry=pathlib.Path(tempfile.mkdtemp(prefix='homemind-registry-',dir='/run'))
         docker_env={**os.environ,'DOCKER_CONFIG':str(registry)}
         try:
-            run(['docker','login','ghcr.io','--username','QuangVMZu','--password-stdin'],env=docker_env,input=payload['token'].encode())
+            run(['docker','login','ghcr.io','--username','PRM392-HOMEMIND','--password-stdin'],env=docker_env,input=payload['token'].encode())
             for key in ['api_image','migration_image','database_image']: run(['docker','pull',record[key]],env=docker_env)
         finally:
             # Owned tmpfs credential directory only; never retain an Actions token.

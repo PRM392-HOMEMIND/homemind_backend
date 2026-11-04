@@ -8,7 +8,7 @@ sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[2]/'scripts/ci'))
 from package_metadata import validate_metadata
 
 def fixture():
-    return {'repository':'QuangVMZu/HomeMind','sha':'a'*40,'run_id':'123','env_revision':'env-'+'e'*32,'token':'test-only-not-a-real-github-token','api_image':'ghcr.io/quangvmzu/homemind-api@sha256:'+'b'*64,'migration_image':'ghcr.io/quangvmzu/homemind-migrate@sha256:'+'c'*64,'database_image':'ghcr.io/quangvmzu/homemind-db@sha256:'+'d'*64}
+    return {'repository':'PRM392-HOMEMIND/homemind_backend','sha':'a'*40,'run_id':'123','env_revision':'env-'+'e'*32,'token':'test-only-not-a-real-github-token','api_image':'ghcr.io/prm392-homemind/homemind-api@sha256:'+'b'*64,'migration_image':'ghcr.io/prm392-homemind/homemind-migrate@sha256:'+'c'*64,'database_image':'ghcr.io/prm392-homemind/homemind-db@sha256:'+'d'*64}
 
 class DeploymentTrustTests(unittest.TestCase):
     def test_private_granular_package_metadata_need_not_supply_repository(self):
@@ -18,7 +18,7 @@ class DeploymentTrustTests(unittest.TestCase):
         for key,value in [('visibility','public'),('owner',{'id':43}),('repository',{'id':101}),('name','another-image')]:
             with self.assertRaises(ValueError): validate_metadata({**package,key:value},'api',42,100)
     def test_rejects_mutable_tag_and_shell_payload(self):
-        for field,value in [('api_image','ghcr.io/quangvmzu/homemind-api:latest'),('sha','a'*40+';id'),('repository','another/repo'),('run_id','123;sh')]:
+        for field,value in [('api_image','ghcr.io/prm392-homemind/homemind-api:latest'),('sha','a'*40+';id'),('repository','another/repo'),('run_id','123;sh')]:
             payload=fixture();payload[field]=value
             with self.assertRaises(ValueError): deploy.validate_payload(payload)
     def responses(self,payload,conclusion='success',event='push',head=None):
@@ -51,7 +51,7 @@ class DeploymentTrustTests(unittest.TestCase):
         return raw,{'artifacts':[{'id':7,'name':'deployment-manifest-1','expired':False,'digest':'sha256:'+hashlib.sha256(raw).hexdigest()}]}
     def test_caller_cannot_substitute_an_untested_image_digest(self):
         payload=fixture();manifest={k:v for k,v in payload.items() if k!='token'}
-        manifest['api_image']='ghcr.io/quangvmzu/homemind-api@sha256:'+'e'*64
+        manifest['api_image']='ghcr.io/prm392-homemind/homemind-api@sha256:'+'e'*64
         raw,metadata=self.artifact(manifest)
         with patch.object(deploy,'github',return_value=metadata),patch.object(deploy,'download_artifact',return_value=raw):
             with self.assertRaisesRegex(ValueError,'does not match'): deploy.verify_manifest(payload,{'run_attempt':1})
