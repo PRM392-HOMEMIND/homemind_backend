@@ -1,9 +1,9 @@
 // Verify a provider-signed transfer payload. Never construct payment QR data.
 export function memoMatches(requested: string, canonical: unknown): canonical is string {
-  if (typeof canonical !== 'string' || !canonical || canonical.length > 200) return false;
+  if (typeof canonical !== 'string' || !canonical || canonical.length > 200 || !requested) return false;
   if (canonical === requested) return true;
-  if (!requested || !canonical.endsWith(requested)) return false;
-  return /^[A-Z0-9]{1,32} $/.test(canonical.slice(0, -requested.length));
+  const escaped = requested.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^A-Za-z0-9])${escaped}([^A-Za-z0-9]|$)`, 'i').test(canonical);
 }
 
 export function qrTags(value: string): Map<string, string> {

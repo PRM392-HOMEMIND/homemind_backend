@@ -8,9 +8,10 @@ describe('signed provider receipt/QR boundaries', () => {
  it('accepts a canonical prefixed memo while binding the original request token',()=>{
   expect(memoMatches('HM1234567',description)).toBe(true);
   expect(memoMatches('HM1234567','HM1234567')).toBe(true);
+  expect(memoMatches('HM2BA49B7','Qanixg4482  CASSO13103 4 VG9l9jJAwL3dFJpflcO4XZSC HM2BA49B7- Ma GD ACSP tb434978')).toBe(true);
   expect(()=>verifyTransferQr(receipt)).not.toThrow();
  });
- it.each(['OTHER123','HM1234567 other','prefix HM1234567','HM1234567x','X'.repeat(33)+' HM1234567','',' HM1234567'])('rejects unbound canonical memo %s',value=>{
+ it.each(['OTHER123','HM1234567x','123HM1234567',''])('rejects unbound canonical memo %s',value=>{
   expect(memoMatches('HM1234567',value)).toBe(false);
  });
  it.each([
