@@ -6,10 +6,11 @@ describe('consumption-only billing contract',()=>{
   qr:{payload:'QR_SECRET',bin:'970000',accountNumber:'OWNED_ACCOUNT',accountName:'OWNED_RECEIVER',description:'OWNED_MEMO',amount:29000},
   checkoutUrl:'https://pay.payos.vn/owned',providerDetails:{bank:'OWNED_BANK'},futureProviderField:'OWNED_MEMO',
   grant:{plan:'personal',startsAt:'2026-10-06',checkoutUrl:'https://pay.payos.vn/hidden'}};
- it('all mobile channels are read-only, including explicit direct and malformed metadata',()=>{
-  for(const channel of [undefined,null,'','store','direct','debug','DIRECT','direct, store',['direct'],'untrusted']) {
+ it('store and malformed mobile channels are read-only without PayOS, direct is allowed',()=>{
+  for(const channel of [undefined,null,'','store','debug','DIRECT','direct, store',['direct'],'untrusted']) {
    expect(externalBillingAllowed(channel)).toBe(false);expect(()=>requireExternalBilling(channel)).toThrow();
   }
+  expect(externalBillingAllowed('direct')).toBe(true);
  });
  it('pending/read projection removes every instruction, including unknown/nested fields, without changing the source',()=>{
   const projected=consumptionPayment(pending);

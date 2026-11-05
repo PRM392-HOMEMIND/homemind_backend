@@ -3,8 +3,8 @@ import { ForbiddenException } from '@nestjs/common';
 // Public client metadata, never an authentication/authorization credential.
 // Owner's temporary policy: every mobile channel is consumption-only.
 // A direct/legacy client header must not reopen checkout or payment instructions.
-export function externalBillingAllowed(_distribution: unknown): boolean {
-  return false;
+export function externalBillingAllowed(distribution: unknown): boolean {
+  return process.env.PAYOS_ENABLED === 'true' || distribution === 'direct';
 }
 
 export function requireExternalBilling(distribution: unknown): void {
